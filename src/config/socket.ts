@@ -1,7 +1,7 @@
+import { IMessage } from '@socket-types';
 import { Socket } from 'socket.io';
-import { v5 as uuidv5 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
 
-const messages = new Set();
 const users = new Map();
 
 const defaultUser = {
@@ -9,13 +9,15 @@ const defaultUser = {
 	name: 'Anonymous',
 };
 
-const messageExpirationTimeMS = 5 * 60 * 1000;
-
 class Connection {
 	public socket: Socket;
+	public messages: Set<IMessage>;
+	public expirationTimeMS: number;
 
 	constructor(socket: Socket) {
 		this.socket = socket;
+		this.messages = new Set();
+		this.expirationTimeMS = 5 * 60 * 1000;
 
 		socket.on('getMessages', () => this.getMessages());
 		socket.on('message', (value: string) => this.handleMessage(value));
@@ -25,18 +27,38 @@ class Connection {
 		);
 	}
 
-    sendMessage(message: string) {
-        this.socket.emit('message', message)
-    }
+	sendMessage(message: IMessage) {
+		this.socket.emit('message', message);
+	}
 
-    getMessages():void {
-        messages.forEach((message:string) => this.sendMessage(message))
-    }
+	getMessages() {
+		this.messages.forEach((message: IMessage) => this.sendMessage(message));
+	}
 
-    handleMessage(value:string) {
-        const message = {
-            id: uuidv5
-        }
-    }
+	handleMessage(value: string) {
+		const message = {
+			id: uuidv4(),
+			user: (users.get(this.socket) || defaultUser) as string,
+			message: value,
+			time: Date.now(),
+		};
 
+		this.messages.add(message);
+		this.sendMessage(message);
+
+		setTimeout(() => {
+			this.messages.delete(message);
+			this.socket.emit('deleteMessage', message.id);
+		}, this.expirationTimeMS);
+	}
+
+	disconnect() {
+		users.delete(this.socket);
+	}
 }
+
+export const chat = (socket: Socket) => {
+	socket.on('connection', () => {
+		new Connection(socket);
+	});
+};

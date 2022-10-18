@@ -12,12 +12,12 @@ const defaultUser = {
 	name: 'Anonymous',
 };
 
-export const sendMessage = (message: IMessage) => io.emit('message', message);
+const sendMessage = (message: IMessage) => io.emit('message', message);
 
 export const getMessages = () =>
 	messages.forEach((message: IMessage) => sendMessage(message));
 
-export const handleMessage = (value: string, socket: Socket) => {
+export const handleMessage = (socket: Socket, value: string) => {
 	const message = {
 		id: uuidv4(),
 		user: (users.get(socket) || defaultUser) as string,
@@ -34,6 +34,12 @@ export const handleMessage = (value: string, socket: Socket) => {
 	}, expirationTimeMS);
 };
 
+export const connect = (socket: Socket) => {
+	io.to(socket.id).emit('socket_id', socket.id);
+};
+
 export const disconnect = (socket: Socket) => {
 	users.delete(socket);
 };
+
+export const connect_error = (err: string) => console.log(err)

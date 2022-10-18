@@ -1,69 +1,21 @@
-import { IMessage } from '@socket-types';
 import { Socket } from 'socket.io';
-import { v4 as uuidv4 } from 'uuid';
+import { io } from '../config/socket';
+import {
+	connect,
+	connect_error,
+	disconnect,
+	getMessages,
+	handleMessage,
+} from '../services/socket.service';
 
-const users = new Map();
+io.on('connection', (socket: Socket) => connect(socket));
 
-const defaultUser = {
-	id: 1,
-	name: 'Anonymous',
-};
+io.on('getMessages', () => getMessages());
 
-class Connection {
-	public socket: Socket;
-	public messages: Set<IMessage>;
-	public expirationTimeMS: number;
+io.on('message', (socket: Socket, value: string) =>
+	handleMessage(socket, value)
+);
 
-	constructor(socket: Socket) {
-		this.socket = socket;
-		this.messages = new Set();
-		this.expirationTimeMS = 5 * 60 * 1000;
+io.on('disconnect', (socket: Socket) => disconnect(socket));
 
-		socket.on('connection', () => this.connection());
-		socket.on('getMessages', () => this.getMessages());
-		socket.on('message', (value: string) => this.handleMessage(value));
-		socket.on('disconnect', () => this.socket.disconnect());
-		socket.on('connect_error', (err: string) =>
-			console.log(`connection error due to ${err}`)
-		);
-	}
-
-	connection() {
-		console.log('socket connected and waiting...');
-	}
-
-	sendMessage(message: IMessage) {
-		this.socket.emit('message', message);
-	}
-
-	getMessages() {
-		this.messages.forEach((message: IMessage) => this.sendMessage(message));
-	}
-
-	handleMessage(value: string) {
-		const message = {
-			id: uuidv4(),
-			user: (users.get(this.socket) || defaultUser) as string,
-			message: value,
-			time: Date.now(),
-		};
-
-		this.messages.add(message);
-		this.sendMessage(message);
-
-		setTimeout(() => {
-			this.messages.delete(message);
-			this.socket.emit('deleteMessage', message.id);
-		}, this.expirationTimeMS);
-	}
-
-	disconnect() {
-		users.delete(this.socket);
-	}
-}
-
-export const chat = (socket: Socket) => {
-	socket.on('connection', () => {
-		new Connection(socket);
-	});
-};
+io.on('connect_error', (err: string) => connect_error(err));

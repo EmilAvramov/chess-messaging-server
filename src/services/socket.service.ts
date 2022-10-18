@@ -1,8 +1,14 @@
-import { IMessage } from '@socket-types';
-import { io } from '../config/socket';
+import { io } from '../config/express';
 import { v4 as uuidv4 } from 'uuid';
 import { Socket } from 'socket.io';
 import { expirationTimeMS } from '../config/settings';
+
+interface IMessage {
+	id: string;
+	user: string;
+	message: string;
+	time: number;
+}
 
 const messages: Set<IMessage> = new Set();
 const users = new Map();
@@ -40,6 +46,7 @@ export const connect = (socket: Socket) => {
 };
 
 export const disconnect = (socket: Socket) => {
+	console.log(`User ${socket.id} disconnected.`)
 	users.delete(socket);
 };
 

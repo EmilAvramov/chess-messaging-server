@@ -4,6 +4,15 @@ import compression from 'compression';
 import helmet from 'helmet';
 import http from 'http';
 import cors from 'cors';
+import { Server, Socket } from 'socket.io';
+
+import {
+	connect,
+	connect_error,
+	disconnect,
+	getMessages,
+	handleMessage,
+} from '../services/socket.service';
 
 dotenv.config();
 
@@ -15,6 +24,7 @@ app.use(
 		origin: '*',
 		allowedHeaders: ['Content-Type', 'X-Authorization'],
 		methods: ['GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'],
+		credentials: true,
 	})
 );
 app.use(compression());
@@ -25,4 +35,23 @@ app.get('/', (req, res) => {
 	res.status(200).json({ message: 'Health check OK' });
 });
 
-export const httpServer = http.createServer(app);
+const httpServer = http.createServer(app);
+
+const io = new Server(httpServer, {
+	cors: {
+		origin: '*',
+		methods: ['GET, POST'],
+	},
+});
+
+io.on('connection', (socket: Socket) => connect(socket));
+
+io.on('getMessages', () => getMessages());
+
+io.on('message', (socket, value: string) => handleMessage(socket, value));
+
+io.on('disconnect', (socket: Socket) => disconnect(socket));
+
+io.on('connect_error', (err: string) => connect_error(err));
+
+export { httpServer, io };

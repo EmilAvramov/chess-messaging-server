@@ -35,6 +35,7 @@ export const handleMessage = (socket: Socket, value: string) => {
 };
 
 export const connect = (socket: Socket) => {
+	console.log(`User ${socket.id} connected on ${new Date()}`);
 	io.to(socket.id).emit('socket_id', socket.id);
 };
 
@@ -42,4 +43,4 @@ export const disconnect = (socket: Socket) => {
 	users.delete(socket);
 };
 
-export const connect_error = (err: string) => console.log(err)
+export const connect_error = (err: string) => console.log(err);

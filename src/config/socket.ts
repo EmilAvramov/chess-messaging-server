@@ -6,6 +6,6 @@ export const io = new Server(httpServer, {
 		origin: '*',
 		methods: ['GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'],
 		allowedHeaders: ['Content-Type', 'X-Authorization'],
-		credentials: false,
+		credentials: true,
 	},
 });

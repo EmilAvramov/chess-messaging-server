@@ -2,13 +2,7 @@ import { io } from '../config/express';
 import { v4 as uuidv4 } from 'uuid';
 import { Socket } from 'socket.io';
 import { expirationTimeMS } from '../config/settings';
-
-interface IMessage {
-	id: string;
-	user: string;
-	message: string;
-	time: number;
-}
+import { IMessage } from '@types-socket';
 
 const messages: Set<IMessage> = new Set();
 const users = new Map();
@@ -30,6 +24,8 @@ export const handleMessage = (socket: Socket, value: string) => {
 		message: value,
 		time: Date.now(),
 	};
+
+	console.log(message)
 
 	messages.add(message);
 	sendMessage(message);

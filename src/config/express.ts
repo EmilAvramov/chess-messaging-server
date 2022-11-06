@@ -13,6 +13,12 @@ import {
 	getMessages,
 	handleMessage,
 } from '../services/socket.service';
+import {
+	ClientToServerEvents,
+	InterServerEvents,
+	ServerToClientEvents,
+	SocketData,
+} from '@types-socket';
 
 dotenv.config();
 
@@ -37,21 +43,25 @@ app.get('/', (req, res) => {
 
 const httpServer = http.createServer(app);
 
-const io = new Server(httpServer, {
+const io = new Server<
+	ClientToServerEvents,
+	ServerToClientEvents,
+	InterServerEvents,
+	SocketData
+>(httpServer, {
 	cors: {
 		origin: '*',
 		methods: ['GET, POST'],
 	},
 });
 
-io.on('connection', (socket: Socket) => connect(socket));
+io.on('connection', (socket) => {
+	connect(socket);
 
-io.on('getMessages', () => getMessages());
-
-io.on('message', (socket, value: string) => handleMessage(socket, value));
-
-io.on('disconnect', (socket: Socket) => disconnect(socket));
-
-io.on('connect_error', (err: string) => connect_error(err));
+	socket.on('message', (msg: string) => handleMessage(socket, msg));
+	socket.on('getMessages', () => getMessages());
+	socket.on('disconnect', () => disconnect(socket));
+	socket.on('connect_error', (err: string) => connect_error(err));
+});
 
 export { httpServer, io };

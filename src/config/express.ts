@@ -4,7 +4,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 import http from 'http';
 import cors from 'cors';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 import {
 	connect,
@@ -15,10 +15,10 @@ import {
 } from '../services/socket.service';
 import {
 	ClientToServerEvents,
-	InterServerEvents,
 	ServerToClientEvents,
+	InterServerEvents,
 	SocketData,
-} from '@types-socket';
+} from '../interfaces/socket';
 
 dotenv.config();
 

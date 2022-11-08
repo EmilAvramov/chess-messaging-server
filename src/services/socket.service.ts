@@ -2,7 +2,7 @@ import { io } from '../config/express';
 import { v4 as uuidv4 } from 'uuid';
 import { Socket } from 'socket.io';
 import { expirationTimeMS } from '../config/settings';
-import { IMessage } from '@types-socket';
+import { IMessage } from '../interfaces/socket';
 
 const messages: Set<IMessage> = new Set();
 const users = new Map();
@@ -25,7 +25,7 @@ export const handleMessage = (socket: Socket, value: string) => {
 		time: Date.now(),
 	};
 
-	console.log(message)
+	console.log(message);
 
 	messages.add(message);
 	sendMessage(message);
@@ -42,7 +42,7 @@ export const connect = (socket: Socket) => {
 };
 
 export const disconnect = (socket: Socket) => {
-	console.log(`User ${socket.id} disconnected.`)
+	console.log(`User ${socket.id} disconnected.`);
 	users.delete(socket);
 };
 

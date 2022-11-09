@@ -11,7 +11,6 @@ const sendMessage = (message: IMessage) => io.emit('message', message);
 
 export const getMessages = () => {
 	messages.forEach((message: IMessage) => sendMessage(message));
-	console.log('sent');
 };
 
 export const handleMessage = (socket: Socket, value: string, user: string) => {
@@ -21,9 +20,6 @@ export const handleMessage = (socket: Socket, value: string, user: string) => {
 		message: value,
 		time: Date.now(),
 	};
-
-	console.log(message);
-	console.log(messages);
 
 	messages.add(message);
 	sendMessage(message);
@@ -45,3 +41,8 @@ export const disconnect = (socket: Socket) => {
 };
 
 export const connect_error = (err: string) => console.log(err);
+
+export const join_server = (socket: Socket, game: string) => {
+	socket.join(game);
+	io.to(socket.id).emit('join', 'Success');
+};

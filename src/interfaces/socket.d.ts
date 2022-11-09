@@ -12,11 +12,13 @@ export interface ServerToClientEvents {
 	socket_id: (id: string) => void;
 	message: (msg: IMessage) => void;
 	getMessages: () => void;
+	join: (status: string) => void;
 }
 
 export interface ClientToServerEvents {
 	message: (msg: string, user: string) => void;
 	getMessages: () => void;
+	join: (room: string) => void;
 	connect_error: (err: string) => void;
 }
 

@@ -12,6 +12,7 @@ import {
 	disconnect,
 	getMessages,
 	handleMessage,
+	join_server,
 } from '../services/socket.service';
 import {
 	ClientToServerEvents,
@@ -63,6 +64,7 @@ io.on('connection', (socket) => {
 	);
 	socket.on('getMessages', () => getMessages());
 	socket.on('disconnect', () => disconnect(socket));
+	socket.on('join', (game: string) => join_server(socket, game));
 	socket.on('connect_error', (err: string) => connect_error(err));
 });
 

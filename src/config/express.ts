@@ -58,7 +58,9 @@ const io = new Server<
 io.on('connection', (socket) => {
 	connect(socket);
 
-	socket.on('message', (msg: string) => handleMessage(socket, msg));
+	socket.on('message', (msg: string, user: string) =>
+		handleMessage(socket, msg, user)
+	);
 	socket.on('getMessages', () => getMessages());
 	socket.on('disconnect', () => disconnect(socket));
 	socket.on('connect_error', (err: string) => connect_error(err));

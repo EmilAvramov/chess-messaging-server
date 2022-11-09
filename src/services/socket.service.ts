@@ -7,25 +7,23 @@ import { IMessage } from '../interfaces/socket';
 const messages: Set<IMessage> = new Set();
 const users = new Map();
 
-const defaultUser = {
-	id: 1,
-	name: 'Anonymous',
-};
-
 const sendMessage = (message: IMessage) => io.emit('message', message);
 
-export const getMessages = () =>
+export const getMessages = () => {
 	messages.forEach((message: IMessage) => sendMessage(message));
+	console.log('sent');
+};
 
-export const handleMessage = (socket: Socket, value: string) => {
+export const handleMessage = (socket: Socket, value: string, user: string) => {
 	const message = {
 		id: uuidv4(),
-		user: (users.get(socket) || defaultUser) as string,
+		user,
 		message: value,
 		time: Date.now(),
 	};
 
 	console.log(message);
+	console.log(messages);
 
 	messages.add(message);
 	sendMessage(message);

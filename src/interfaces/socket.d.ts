@@ -15,7 +15,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-	message: (msg: string) => void;
+	message: (msg: string, user: string) => void;
 	getMessages: () => void;
 	connect_error: (err: string) => void;
 }

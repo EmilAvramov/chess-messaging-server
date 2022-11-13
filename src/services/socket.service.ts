@@ -32,7 +32,9 @@ export const handleMessage = (socket: Socket, value: string, user: string) => {
 
 export const connect = (socket: Socket) => {
 	console.log(`User ${socket.id} connected on ${new Date()}`);
+	socket.join('lobby');
 	io.to(socket.id).emit('socket_id', socket.id);
+	io.to(socket.id).emit('join', 'Lobby');
 };
 
 export const disconnect = (socket: Socket) => {

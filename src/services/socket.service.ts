@@ -13,10 +13,16 @@ export const getMessages = () => {
 	messages.forEach((message: IMessage) => sendMessage(message));
 };
 
-export const handleMessage = (socket: Socket, value: string, user: string) => {
+export const handleMessage = (
+	socket: Socket,
+	value: string,
+	user: string,
+	name: string
+) => {
 	const message = {
 		id: uuidv4(),
 		user,
+		name,
 		message: value,
 		time: Date.now(),
 	};

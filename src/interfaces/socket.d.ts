@@ -1,6 +1,7 @@
 export interface IMessage {
 	id: string;
 	user: string;
+	name: string;
 	message: string;
 	time: number;
 }
@@ -16,7 +17,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-	message: (msg: string, user: string) => void;
+	message: (msg: string, user: string, name: string) => void;
 	getMessages: () => void;
 	join: (room: string) => void;
 	connect_error: (err: string) => void;

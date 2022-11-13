@@ -59,8 +59,8 @@ const io = new Server<
 io.on('connection', (socket) => {
 	connect(socket);
 
-	socket.on('message', (msg: string, user: string) =>
-		handleMessage(socket, msg, user)
+	socket.on('message', (msg: string, user: string, name: string) =>
+		handleMessage(socket, msg, user, name)
 	);
 	socket.on('getMessages', () => getMessages());
 	socket.on('disconnect', () => disconnect(socket));
